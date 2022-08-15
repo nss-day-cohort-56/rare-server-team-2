@@ -3,7 +3,8 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
-from app_api.models import Category
+
+from app_api.models.category import Category
 
 
 class CategoryView(ViewSet):
