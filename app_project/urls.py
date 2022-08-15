@@ -15,10 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app_api.views import register_user, login_user
+from app_api.views import register_user, login_user, PostView
+from rest_framework import routers
+from django.conf.urls import include
+
+
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'posts', PostView, 'posts')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register', register_user),
     path('login', login_user),
+    path('', include(router.urls))
 ]
