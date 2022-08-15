@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -5,7 +6,10 @@ from rest_framework import serializers, status
 from app_api.models import Post
 from app_api.models import RareUser
 from app_api.models import Category
+from app_api.models import PostTag
+from app_api.models import Tag
 from django.db.models import Q
+import datetime
 
 class PostView(ViewSet):
     """Level up game types view"""
@@ -44,17 +48,23 @@ class PostView(ViewSet):
 
     def create(self, request):
         """Handle POST operations"""
+        tagarr = request.data.pop('tags')
         user = RareUser.objects.get(user=request.auth.user)
-        cat = Category.objects.get(pk=request.data["category"])
+        cat = Category.objects.get(pk=request.data["category_id"])
         post = Post.objects.create(
             title=request.data["title"],
             user=user,
             category=cat,
-            publication_date=request.data["publication_date"],
+            publication_date= datetime.date.today(),
             image_url=request.data["image_url"],
             content=request.data["content"],
-            approved=request.data["approved"]
+            approved=True
         )
+        for tag in tagarr:
+            PostTag.objects.create(
+                post=post,
+                tag=Tag.objects.get(pk=tag)
+            )
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
