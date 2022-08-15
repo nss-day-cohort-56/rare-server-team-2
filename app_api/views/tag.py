@@ -10,12 +10,12 @@ class TagView(ViewSet):
     """ Rare tags view
     """
     def list(self, request):
-        """The GET for all tags in the database
+        """The GET for all tags in the database, in alphabetical order
 
         Returns: 
             Response: JSON serialized list of tags
         """
-        tags = Tag.objects.all.order_by("label")
+        tags = Tag.objects.all().order_by("label")
 
         serializer = TagSerializer(tags, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
