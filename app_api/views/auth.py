@@ -29,8 +29,9 @@ def login_user(request):
             'user_id': authenticated_user.id
         }
     else:
-        data = { 'valid': False }
+        data = {'valid': False}
     return Response(data)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -48,10 +49,18 @@ def register_user(request):
     )
 
     # TODO: If you're using a model with a 1 to 1 relationship to the django user, create that object here
+    rare_user = RareUser.objects.create(
+        bio=request.data['bio'],
+        profile_image_url=request.data['profile_image_url'],
+        created_on=request.data['created_on'],
+        active=request.data['active'],
+        user=new_user
+    )
 
-    
-    token = Token.objects.create(user=new_user)
-    # TODO: If you need to send the client more information update the data dict
-    
-    data = { 'token': token.key, 'user_id': new_user.id }
+
+# TODO: If you need to send the client more information update the data dict
+    token = Token.objects.create(user=rare_user.user)
+    # token = Token.objects.create(user=new_user)
+
+    data = {'token': token.key, 'user_id': new_user.id}
     return Response(data, status=status.HTTP_201_CREATED)
