@@ -16,9 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app_api.views import register_user, login_user
+from django.conf.urls import include
+from rest_framework import routers
+
+from app_api.views.comment import CommentView 
+
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'comments', CommentView, 'comment')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register', register_user),
     path('login', login_user),
+    path('', include(router.urls)),
 ]

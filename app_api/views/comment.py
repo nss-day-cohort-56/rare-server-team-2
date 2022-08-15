@@ -26,7 +26,7 @@ class CommentView(ViewSet):
             JSON serialized list of comments
         """
         
-        comments = Comment.Objects.all()
+        comments = Comment.objects.all()
         
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
