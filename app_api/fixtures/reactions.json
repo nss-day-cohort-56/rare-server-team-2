@@ -1,0 +1,32 @@
+[
+    {
+        "model": "app_api.reaction",
+        "pk": 1, 
+        "fields": {
+            "label": "Haha",
+            "image_url": "https://www.kindpng.com/picc/m/1-14764_haha-reaction-facebook-png-facebook-haha-react-png.png"
+        }
+    },
+    {
+        "model": "app_api.reaction",
+        "pk": 2, 
+        "fields": {
+            "label": "Wow",
+            "image_url": "https://p.kindpng.com/picc/s/80-807013_auto-reactions-facebook-reactions-wow-png-transparent-png.png"
+        }
+    },    {
+        "model": "app_api.reaction",
+        "pk": 3, 
+        "fields": {
+            "label": "Thinking", 
+            "image_url": "https://image.pngaaa.com/49/3989049-middle.png"
+        }
+    },    {
+        "model": "app_api.reaction",
+        "pk": 4, 
+        "fields": {
+            "label": "Like",
+            "image_url": "https://www.userflow.nl/images/Linkedin-Like-Icon-Thumbup250.png"
+        }
+    }
+]

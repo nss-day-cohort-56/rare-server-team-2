@@ -1,0 +1,34 @@
+[
+    {
+        "model": "app_api.tag",
+        "pk": 1, 
+        "fields": {
+            "label": "Art"
+        }
+    },
+    {
+        "model": "app_api.tag",
+        "pk": 2, 
+        "fields": {
+            "label": "Food"
+        }
+    },    {
+        "model": "app_api.tag",
+        "pk": 3, 
+        "fields": {
+            "label": "Sports"
+        }
+    },    {
+        "model": "app_api.tag",
+        "pk": 4, 
+        "fields": {
+            "label": "Writing"
+        }
+    },    {
+        "model": "app_api.tag",
+        "pk": 5, 
+        "fields": {
+            "label": "Music"
+        }
+    }
+]
