@@ -1,0 +1,49 @@
+[
+    {
+        "model": "app_api.comment",
+        "pk": 1, 
+        "fields": {
+            "post": 1,
+            "author": 1,
+            "content": "Really good post.",
+            "created_on": "2022-08-10"
+        }
+    },
+    {
+        "model": "app_api.comment",
+        "pk": 2, 
+        "fields": {
+            "post": 2,
+            "author": 2,
+            "content": "Wow I didn't know that.",
+            "created_on": "2022-08-15"
+        }
+    },    {
+        "model": "app_api.comment",
+        "pk": 3, 
+        "fields": {
+            "post": 3,
+            "author": 1,
+            "content": "This is great.",
+            "created_on": "2022-08-11" 
+        }
+    },    {
+        "model": "app_api.comment",
+        "pk": 4, 
+        "fields": {
+            "post": 1,
+            "author": 2,
+            "content": "Did not find this interesting.",
+            "created_on": "2022-08-12"
+        }
+    },    {
+        "model": "app_api.comment",
+        "pk": 5, 
+        "fields": {
+            "post": 2,
+            "author": 1,
+            "content": "I cant believe I read the whole thing.",
+            "created_on": "2022-08-10"
+        }
+    }
+]
