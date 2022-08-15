@@ -1,0 +1,1 @@
+DELETE FROM authtoken_token WHERE user_id=1;

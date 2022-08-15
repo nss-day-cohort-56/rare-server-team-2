@@ -1,7 +1,7 @@
-from xml.etree.ElementTree import Comment
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
+from app_api.models.comment import Comment
 
 
 class CommentView(ViewSet):
@@ -74,7 +74,7 @@ class CommentView(ViewSet):
 class CommentSerializer(serializers.ModelSerializer):
     """JSON serializer for comments"""
     
-    class meta:
+    class Meta:
         model = Comment
         fields = ( 'id', 'post_id', 'author_id', 'content', 'created_on' )
         depth = 2        
