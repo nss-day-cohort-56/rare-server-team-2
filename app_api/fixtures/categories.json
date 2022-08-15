@@ -1,0 +1,34 @@
+[
+    {
+        "model": "app_api.category",
+        "pk": 1, 
+        "fields": {
+            "label": "Startup"
+        }
+    },
+    {
+        "model": "app_api.category",
+        "pk": 2, 
+        "fields": {
+            "label": "Life"
+        }
+    },    {
+        "model": "app_api.category",
+        "pk": 3, 
+        "fields": {
+            "label": "Travel"
+        }
+    },    {
+        "model": "app_api.category",
+        "pk": 4, 
+        "fields": {
+            "label": "Design"
+        }
+    },    {
+        "model": "app_api.category",
+        "pk": 5, 
+        "fields": {
+            "label": "Technology"
+        }
+    }
+]
