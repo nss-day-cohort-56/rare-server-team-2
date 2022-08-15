@@ -21,8 +21,13 @@ from rest_framework import routers
 
 from app_api.views.category import CategoryView
 
+from app_api.views import TagView, ReactionView
+
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'categories', CategoryView, 'category')
+
+router.register(r'tags', TagView, 'tag')
+router.register(r'reactions', ReactionView, 'reaction')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
