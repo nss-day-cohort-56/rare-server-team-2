@@ -66,7 +66,7 @@ class PostView(ViewSet):
     def update(self, request, pk):
         """handle put"""
         post = Post.objects.get(pk=pk)
-        cat = Category.objects.get(pk=request.data["category"]['id'])
+        cat = Category.objects.get(pk=request.data["category_id"])
         post.title = request.data["title"]
         post.publication_date = request.data["publication_date"]
         post.image_url = request.data["image_url"]
