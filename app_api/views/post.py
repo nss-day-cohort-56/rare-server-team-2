@@ -43,6 +43,9 @@ class PostView(ViewSet):
         category = request.query_params.get('category', None)
         if category is not None:
             posts = Post.objects.filter(category=category)
+        tag = request.query_params.get('tag', None)
+        if tag is not None:
+            posts = Post.objects.filter(tag=tag)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
