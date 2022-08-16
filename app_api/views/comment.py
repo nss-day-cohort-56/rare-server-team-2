@@ -80,7 +80,7 @@ class CommentView(ViewSet):
     def destroy(self, request, pk):
     
         comment = Comment.objects.get(pk=pk)
-        comment.delete
+        comment.delete()
         
         return Response(None, status=status.HTTP_204_NO_CONTENT)     
         
@@ -91,4 +91,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ( 'id', 'post_id', 'author_id', 'content', 'created_on' )
-        depth = 2        
+        depth = 2       
