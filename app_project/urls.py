@@ -16,16 +16,17 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
-from app_api.views import register_user, login_user
+from app_api.views import register_user, login_user, PostView
 from rest_framework import routers
-
 from app_api.views.category import CategoryView
+
 
 from app_api.views import TagView, ReactionView
 
-router = routers.DefaultRouter(trailing_slash=False)
-router.register(r'categories', CategoryView, 'category')
 
+router = routers.DefaultRouter(trailing_slash=False)
+router.register(r'posts', PostView, 'posts')
+router.register(r'categories', CategoryView, 'category')
 router.register(r'tags', TagView, 'tag')
 router.register(r'reactions', ReactionView, 'reaction')
 
