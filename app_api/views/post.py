@@ -1,5 +1,7 @@
 from datetime import datetime
+from email.policy import default
 from django.http import HttpResponseServerError
+from django.db.models import Count
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
@@ -11,6 +13,7 @@ from app_api.models import Tag
 from django.db.models import Q
 import datetime
 
+
 class PostView(ViewSet):
     """Level up game types view"""
 
@@ -19,24 +22,27 @@ class PostView(ViewSet):
         Returns:
             Response -- JSON serialized game type"""
         try:
+            post = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
             post = Post.objects.get(pk=pk)
             serializer = PostSerializer(post)
             return Response(serializer.data)
         except Post.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
-        
 
     def list(self, request):
         """Handle GET requests to get all game types
         Returns:
             Response -- JSON serialized list of game types
         """
-        posts = Post.objects.all()
+        # posts = Post.objects.all()
+
+        posts = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
+
         search_text = self.request.query_params.get('title', None)
         if search_text is not None:
             posts = Post.objects.filter(
-                    Q(title__contains=search_text) |
-                    Q(content__contains=search_text))
+                Q(title__contains=search_text) |
+                Q(content__contains=search_text))
         user = request.query_params.get('user', None)
         if user is not None:
             posts = Post.objects.filter(user=user)
@@ -57,7 +63,7 @@ class PostView(ViewSet):
             title=request.data["title"],
             user=user,
             category=cat,
-            publication_date= datetime.date.today(),
+            publication_date=datetime.date.today(),
             image_url=request.data["image_url"],
             content=request.data["content"],
             approved=True
@@ -85,10 +91,14 @@ class PostView(ViewSet):
         post.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
     """
+    reaction_count = serializers.IntegerField(default=0)
+
     class Meta:
         model = Post
-        fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',  'content', 'tags', 'reactions', 'approved')
+        fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',
+                  'content', 'tags', 'reactions', 'approved', 'reaction_count')
         depth = 2
