@@ -32,7 +32,7 @@ class PostView(ViewSet):
             Response -- JSON serialized list of game types
         """
         posts = Post.objects.all()
-        search_text = self.request.query_params.get('q', None)
+        search_text = self.request.query_params.get('title', None)
         if search_text is not None:
             posts = Post.objects.filter(
                     Q(title__contains=search_text) |
@@ -74,8 +74,6 @@ class PostView(ViewSet):
         post = Post.objects.get(pk=pk)
         post.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
-
-
 
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
