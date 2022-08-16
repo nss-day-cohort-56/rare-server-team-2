@@ -68,17 +68,7 @@ class PostView(ViewSet):
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, pk):
-        """handle put"""
-        cat = Category.objects.get(pk=request.data["category"])
-        post = Post.objects.get(pk=pk)
-        post.title = request.data["title"]
-        post.publication_date = request.data["publication_date"]
-        post.image_url = request.data["image_url"]
-        post.category = cat
-        post.content = request.data["content"]
-        post.save()
-        return Response(None, status=status.HTTP_204_NO_CONTENT)
+    
 
     def destroy(self, request, pk):
         post = Post.objects.get(pk=pk)
