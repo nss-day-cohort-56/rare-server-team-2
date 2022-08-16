@@ -68,13 +68,7 @@ class CommentView(ViewSet):
         
         comment = Comment.objects.get(pk=pk)
         
-        post = Post.objects.get(pk=request.data["post"])
-        comment.post = post
-        
-        author = RareUser.objects.get(pk=request.data["user_id"])
-        comment.author = author
-        
-        comment.created_on = request.data["created_on"]
+        comment.content = request.data['content']
         
         comment.save()
         
