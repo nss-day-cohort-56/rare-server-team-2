@@ -23,25 +23,18 @@ class SubscriptionView(ViewSet):
     #         return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
         
 
-    # def list(self, request):
-    #     """Handle GET requests to get all game types
-    #     Returns:
-    #         Response -- JSON serialized list of game types
-    #     """
-    #     posts = Post.objects.all()
-    #     search_text = self.request.query_params.get('title', None)
-    #     if search_text is not None:
-    #         posts = Post.objects.filter(
-    #                 Q(title__contains=search_text) |
-    #                 Q(content__contains=search_text))
-    #     user = request.query_params.get('user', None)
-    #     if user is not None:
-    #         posts = Post.objects.filter(user=user)
-    #     category = request.query_params.get('category', None)
-    #     if category is not None:
-    #         posts = Post.objects.filter(category=category)
-    #     serializer = PostSerializer(posts, many=True)
-    #     return Response(serializer.data)
+    def list(self, request):
+        """Handle GET requests to get all game types
+        Returns:
+            Response -- JSON serialized list of game types
+        """
+        subs = Subscription.objects.all()
+        author = request.query_params.get('author', None)
+        if author is not None:
+            follower=RareUser.objects.get(user=request.auth.user)
+            subs = Subscription.objects.filter(author=author, follower=follower)
+        serializer = SubscriptionSerializer(subs, many=True)
+        return Response(serializer.data)
 
     def create(self, request):
         """Handle POST operations"""
@@ -64,10 +57,10 @@ class SubscriptionView(ViewSet):
         sub.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
-    # def destroy(self, request, pk):
-    #     post = Post.objects.get(pk=pk)
-    #     post.delete()
-    #     return Response(None, status=status.HTTP_204_NO_CONTENT)
+    def destroy(self, request, pk):
+        sub = Subscription.objects.get(pk=pk)
+        sub.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
