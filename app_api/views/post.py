@@ -59,7 +59,8 @@ class PostView(ViewSet):
         """Handle POST operations"""
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
-        post = Post.objects.create(
+        if user.user.is_staff == True:
+            post = Post.objects.create(
             title=request.data["title"],
             user=user,
             category=cat,
@@ -67,7 +68,17 @@ class PostView(ViewSet):
             image_url=request.data["image_url"],
             content=request.data["content"],
             approved=True
-        )
+            )
+        else:
+            post = Post.objects.create(
+                title=request.data["title"],
+                user=user,
+                category=cat,
+                publication_date= datetime.date.today(),
+                image_url=request.data["image_url"],
+                content=request.data["content"],
+                approved=False
+            )
         post.tags.add(*request.data['tags'])
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -81,6 +92,7 @@ class PostView(ViewSet):
         post.image_url = request.data["image_url"]
         post.category = cat
         post.content = request.data["content"]
+        post.approved = request.data["approved"]
         post.save()
         post.tags.clear()
         post.tags.add(*request.data['tags'])
