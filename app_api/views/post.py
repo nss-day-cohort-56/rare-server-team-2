@@ -32,7 +32,7 @@ class PostView(ViewSet):
             Response -- JSON serialized list of game types
         """
         posts = Post.objects.all()
-        search_text = self.request.query_params.get('q', None)
+        search_text = self.request.query_params.get('title', None)
         if search_text is not None:
             posts = Post.objects.filter(
                     Q(title__contains=search_text) |
@@ -48,7 +48,6 @@ class PostView(ViewSet):
 
     def create(self, request):
         """Handle POST operations"""
-        tagarr = request.data.pop('tags')
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
         post = Post.objects.create(
@@ -60,22 +59,28 @@ class PostView(ViewSet):
             content=request.data["content"],
             approved=True
         )
-        for tag in tagarr:
-            PostTag.objects.create(
-                post=post,
-                tag=Tag.objects.get(pk=tag)
-            )
+        post.tags.add(*request.data['tags'])
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    
+    def update(self, request, pk):
+        """handle put"""
+        post = Post.objects.get(pk=pk)
+        cat = Category.objects.get(pk=request.data["category_id"])
+        post.title = request.data["title"]
+        post.publication_date = request.data["publication_date"]
+        post.image_url = request.data["image_url"]
+        post.category = cat
+        post.content = request.data["content"]
+        post.save()
+        post.tags.clear()
+        post.tags.add(*request.data['tags'])
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk):
         post = Post.objects.get(pk=pk)
         post.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
-
-
 
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
