@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+from app_api.models import RareUser
 
 
 @api_view(['POST'])
@@ -26,7 +27,8 @@ def login_user(request):
         data = {
             'valid': True,
             'token': token.key,
-            'user_id': authenticated_user.id
+            'user_id': authenticated_user.id,
+            'is_staff': authenticated_user.is_staff
         }
     else:
         data = {'valid': False}
@@ -58,9 +60,10 @@ def register_user(request):
     )
 
 
-# TODO: If you need to send the client more information update the data dict
+    # TODO: If you need to send the client more information update the data dict
     token = Token.objects.create(user=rare_user.user)
     # token = Token.objects.create(user=new_user)
 
-    data = {'token': token.key, 'user_id': new_user.id}
+    data = {'token': token.key, 'user_id': new_user.id, 'is_staff': new_user.is_staff}
+
     return Response(data, status=status.HTTP_201_CREATED)
