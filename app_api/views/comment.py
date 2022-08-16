@@ -1,9 +1,12 @@
+from datetime import datetime
+from xmlrpc.client import DateTime
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from app_api.models.comment import Comment
 from app_api.models.post import Post
 from ..models.rare_user import RareUser
+import datetime
 
 
 
@@ -52,7 +55,7 @@ class CommentView(ViewSet):
         post = post,
         author = author,    
         content = request.data["content"],
-        created_on = request.data["created_on"]
+        created_on = datetime.date.today()
         )
         
         serializer = CommentSerializer(comment)
