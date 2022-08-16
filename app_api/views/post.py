@@ -32,7 +32,7 @@ class PostView(ViewSet):
             Response -- JSON serialized list of game types
         """
         posts = Post.objects.all()
-        search_text = self.request.query_params.get('q', None)
+        search_text = self.request.query_params.get('title', None)
         if search_text is not None:
             posts = Post.objects.filter(
                     Q(title__contains=search_text) |
@@ -43,15 +43,18 @@ class PostView(ViewSet):
         category = request.query_params.get('category', None)
         if category is not None:
             posts = Post.objects.filter(category=category)
+        tag = request.query_params.get('tag_id', None)
+        if tag is not None:
+            posts = Post.objects.filter(tags=tag)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         """Handle POST operations"""
-        tagarr = request.data.pop('tags')
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
-        post = Post.objects.create(
+        if user.user.is_staff == True:
+            post = Post.objects.create(
             title=request.data["title"],
             user=user,
             category=cat,
@@ -59,23 +62,40 @@ class PostView(ViewSet):
             image_url=request.data["image_url"],
             content=request.data["content"],
             approved=True
-        )
-        for tag in tagarr:
-            PostTag.objects.create(
-                post=post,
-                tag=Tag.objects.get(pk=tag)
             )
+        else:
+            post = Post.objects.create(
+                title=request.data["title"],
+                user=user,
+                category=cat,
+                publication_date= datetime.date.today(),
+                image_url=request.data["image_url"],
+                content=request.data["content"],
+                approved=False
+            )
+        post.tags.add(*request.data['tags'])
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    
+    def update(self, request, pk):
+        """handle put"""
+        post = Post.objects.get(pk=pk)
+        cat = Category.objects.get(pk=request.data["category_id"])
+        post.title = request.data["title"]
+        post.publication_date = request.data["publication_date"]
+        post.image_url = request.data["image_url"]
+        post.category = cat
+        post.content = request.data["content"]
+        post.approved = request.data["approved"]
+        post.save()
+        post.tags.clear()
+        post.tags.add(*request.data['tags'])
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk):
         post = Post.objects.get(pk=pk)
         post.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
-
-
 
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types

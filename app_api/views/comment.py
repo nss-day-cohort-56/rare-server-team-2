@@ -1,9 +1,12 @@
+from datetime import datetime
+from xmlrpc.client import DateTime
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from app_api.models.comment import Comment
 from app_api.models.post import Post
 from ..models.rare_user import RareUser
+import datetime
 
 
 
@@ -31,6 +34,10 @@ class CommentView(ViewSet):
         
         comments = Comment.objects.all()
         
+        post_id =request.query_params.get('post_id', None)
+        if post_id is not None:
+                comments = comments.filter(post_id=post_id)
+        
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
     
@@ -48,7 +55,7 @@ class CommentView(ViewSet):
         post = post,
         author = author,    
         content = request.data["content"],
-        created_on = request.data["created_on"]
+        created_on = datetime.date.today()
         )
         
         serializer = CommentSerializer(comment)
@@ -76,7 +83,7 @@ class CommentView(ViewSet):
     def destroy(self, request, pk):
     
         comment = Comment.objects.get(pk=pk)
-        comment.delete
+        comment.delete()
         
         return Response(None, status=status.HTTP_204_NO_CONTENT)     
         
@@ -87,4 +94,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ( 'id', 'post_id', 'author_id', 'content', 'created_on' )
-        depth = 2        
+        depth = 2       
