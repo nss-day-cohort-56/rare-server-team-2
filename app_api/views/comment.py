@@ -2,6 +2,9 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from app_api.models.comment import Comment
+from app_api.models.post import Post
+from ..models.rare_user import RareUser
+
 
 
 class CommentView(ViewSet):
@@ -37,8 +40,8 @@ class CommentView(ViewSet):
         Return ---JSON comment instance
         """
         
-        post = Post.objects.get(pk=request.data["post"])
-        author = Author.objects.get(author=request.auth.user)
+        post = Post.objects.get(pk=request.data["post_id"])
+        author = RareUser.objects.get(user_id=request.auth.user)
         
         comment = Comment.objects.create(
         
@@ -61,7 +64,7 @@ class CommentView(ViewSet):
         post = Post.objects.get(pk=request.data["post"])
         comment.post = post
         
-        author = Author.objects.get(pk=request.data["author"])
+        author = RareUser.objects.get(pk=request.data["user_id"])
         comment.author = author
         
         comment.created_on = request.data["created_on"]
