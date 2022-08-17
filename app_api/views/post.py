@@ -41,7 +41,8 @@ class PostView(ViewSet):
                 for post in posts:
                     if post.user == sub.author:
                         subbed_posts.append(post)
-            posts = subbed_posts
+            
+            posts = set(subbed_posts)
                 #only posts whose authorId matches the authors subscribed to
             
         search_text = self.request.query_params.get('title', None)
