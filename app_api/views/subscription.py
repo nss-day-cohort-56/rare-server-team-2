@@ -10,19 +10,6 @@ import datetime
 
 class SubscriptionView(ViewSet):
     """Level up game types view"""
-
-    # def retrieve(self, request, pk):
-    #     """Handle GET requests for single game type
-    #     Returns:
-    #         Response -- JSON serialized game type"""
-    #     try:
-    #         post = Post.objects.get(pk=pk)
-    #         serializer = PostSerializer(post)
-    #         return Response(serializer.data)
-    #     except Post.DoesNotExist as ex:
-    #         return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
-        
-
     def list(self, request):
         """Handle GET requests to get all game types
         Returns:
@@ -46,7 +33,6 @@ class SubscriptionView(ViewSet):
             created_on= datetime.date.today(),
             ended_on=None
         )
-        
         serializer = SubscriptionSerializer(subscription)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
