@@ -35,6 +35,19 @@ class PostView(ViewSet):
             Response -- JSON serialized list of game types
         """
         posts = Post.objects.all()
+        subscriptions = self.request.query_params.get('subscriptions', None)
+        if subscriptions is not None:
+            currentuser = RareUser.objects.get(user=request.auth.user)
+            subs = currentuser.follower.all()
+            subbed_posts = []
+            for sub in subs:
+                for post in posts:
+                    if post.user == sub.author:
+                        subbed_posts.append(post)
+            
+            posts = set(subbed_posts)
+                #only posts whose authorId matches the authors subscribed to
+            
         search_text = self.request.query_params.get('title', None)
         if search_text is not None:
             posts = Post.objects.filter(
