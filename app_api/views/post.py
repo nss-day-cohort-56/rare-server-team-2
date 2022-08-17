@@ -107,7 +107,7 @@ class PostView(ViewSet):
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
     """
-    reaction_count = serializers.IntegerField(default=0)
+    reaction_count = serializers.IntegerField(default=None)
 
     class Meta:
         model = Post
