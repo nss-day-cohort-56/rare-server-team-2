@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from app_api.models import Post
 from app_api.models import RareUser
-from app_api.models import Category
+from app_api.models import Category, Reaction, PostReaction
 from app_api.models import PostTag
 from app_api.models import Tag
 from django.db.models import Q
@@ -22,9 +22,13 @@ class PostView(ViewSet):
         Returns:
             Response -- JSON serialized game type"""
         try:
-            post = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
             post = Post.objects.get(pk=pk)
+            reactions= post.reactions.all()
+            for reaction in reactions:
+                reaction.reaction_count=post
+            reaction_serializer = ReactionSerializer(reactions, many=True)
             serializer = PostSerializer(post)
+            serializer.data['reactions'] = reaction_serializer.data
             return Response(serializer.data)
         except Post.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
@@ -34,9 +38,9 @@ class PostView(ViewSet):
         Returns:
             Response -- JSON serialized list of game types
         """
-        # posts = Post.objects.all()
+        posts = Post.objects.all()
 
-        posts = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
+        # posts = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
 
         search_text = self.request.query_params.get('title', None)
         if search_text is not None:
@@ -104,13 +108,27 @@ class PostView(ViewSet):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
+
+class ReactionSerializer(serializers.ModelSerializer):
+    """
+    JSON serializer for the tag data received
+    """
+    # reaction_count = serializers.IntegerField()
+
+    class Meta:
+        model = Reaction
+        fields = ('id', 'label', 'image_url',
+        'reaction_count'
+        )
+        depth = 1
+
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
     """
-    reaction_count = serializers.IntegerField(default=None)
+    reactions = ReactionSerializer(many=True)
 
     class Meta:
         model = Post
         fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',
-                  'content', 'tags', 'reactions', 'approved', 'reaction_count')
+                  'content', 'tags', 'reactions', 'approved')
         depth = 2
