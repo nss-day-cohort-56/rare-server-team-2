@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
-from app_api.models import rare_user
 
 from app_api.models.rare_user import RareUser
 
@@ -33,11 +32,21 @@ class RareUserView(ViewSet):
         serializer = RareUserSerializer(rare_users, many=True)
         return Response(serializer.data)
 
+    
     def update(self, request, pk):
         """Handle PUT requests for a user
         
-        Response -- Empty body with 204 status code"""
+        Response --  200 OK status code"""
         
+        user = User.objects.get(pk=pk)
+        user.is_active = not user.is_active
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+
+    @action(methods=["put"], detail=True)
+    def change_staff_status(self, request, pk):
 
         user = User.objects.get(pk=pk)
         user.is_staff = not user.is_staff
@@ -46,10 +55,11 @@ class RareUserView(ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_staff')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'is_active')
         # ordering =  ['username']
 
 class RareUserSerializer(serializers.ModelSerializer):
@@ -57,4 +67,4 @@ class RareUserSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = RareUser
-        fields = ('id', 'user', 'bio', 'profile_image_url', 'created_on', 'active')
+        fields = ('id', 'user', 'bio', 'profile_image_url', 'created_on')
