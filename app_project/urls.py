@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 from app_api.views.category import CategoryView
 from app_api.views.comment import CommentView
 from app_api.views import TagView, ReactionView, RareUserView, PostView, register_user, login_user
@@ -38,4 +40,4 @@ urlpatterns = [
 
     path('', include(router.urls))
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
