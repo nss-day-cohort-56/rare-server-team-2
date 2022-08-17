@@ -19,7 +19,7 @@ class SubscriptionView(ViewSet):
         author = request.query_params.get('author', None)
         if author is not None:
             follower=RareUser.objects.get(user=request.auth.user)
-            subs = Subscription.objects.filter(author=author, follower=follower)
+            subs = Subscription.objects.filter(author=author, follower=follower, ended_on=None)
         serializer = SubscriptionSerializer(subs, many=True)
         return Response(serializer.data)
 
