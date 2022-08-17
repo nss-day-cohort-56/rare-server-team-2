@@ -1,4 +1,6 @@
+import base64
 from datetime import datetime
+import uuid
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -10,6 +12,7 @@ from app_api.models import PostTag
 from app_api.models import Tag
 from django.db.models import Q
 import datetime
+from django.core.files.base import ContentFile
 
 class PostView(ViewSet):
     """Level up game types view"""
@@ -53,23 +56,30 @@ class PostView(ViewSet):
         """Handle POST operations"""
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
+        
+        format, imgstr = request.data["image_url"].split(';base64,')
+        ext = format.split('/')[-1]
+        data = ContentFile(base64.b64decode(imgstr), name=f'{request.data["title"]}-{uuid.uuid4()}.{ext}')
+        
+        
         if user.user.is_staff == True:
             post = Post.objects.create(
             title=request.data["title"],
             user=user,
             category=cat,
             publication_date= datetime.date.today(),
-            image_url=request.data["image_url"],
+            image_url=data,
             content=request.data["content"],
             approved=True
             )
+            
         else:
             post = Post.objects.create(
                 title=request.data["title"],
                 user=user,
                 category=cat,
                 publication_date= datetime.date.today(),
-                image_url=request.data["image_url"],
+                image_url=data,
                 content=request.data["content"],
                 approved=False
             )
