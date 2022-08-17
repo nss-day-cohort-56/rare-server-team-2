@@ -1,3 +1,4 @@
+import base64
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -5,6 +6,8 @@ from rest_framework import serializers, status
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from app_api.models import rare_user
+import uuid
+from django.core.files.base import ContentFile
 
 from app_api.models.rare_user import RareUser
 
@@ -35,16 +38,30 @@ class RareUserView(ViewSet):
 
     def update(self, request, pk):
         """Handle PUT requests for a user
-        
-        Response -- Empty body with 204 status code"""
-        
 
+        Response -- Empty body with 204 status code"""
         user = User.objects.get(pk=pk)
+        rare_user = RareUser.objects.get(user=request.auth.user)
         user.is_staff = not user.is_staff
+        # Create a new instance of the game picture model you defined
+        # Example: game_picture = GamePicture()
+        format, imgstr = request.data["image"].split(';base64,')
+        ext = format.split('/')[-1]
+        data = ContentFile(base64.b64decode(imgstr), name=f'{request.data["id"]}-{uuid.uuid4()}.{ext}')
+
+        # Give the image property of your game picture instance a value
+        # For example, if you named your property `action_pic`, then
+        # you would specify the following code:
+        #
+        #       game_picture.action_pic = data
+
+        # Save the data to the database with the save() method
+        rare_user.profile_image_url = data
+        rare_user.save()
         user.save()
         serializer = UserSerializer(user)
+        serializer = RareUserSerializer(rare_user)
         return Response(serializer.data, status=status.HTTP_200_OK) 
-
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
