@@ -1,17 +1,19 @@
+import base64
 from datetime import datetime
+import uuid
 from django.http import HttpResponseServerError
-from django.db.models import Count
 from rest_framework.viewsets import ViewSet
-from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework import serializers, status
 from app_api.models import Post
 from app_api.models import RareUser
-from app_api.models import Category, Reaction, PostReaction
+from app_api.models import Category, Reaction
 from app_api.models import PostTag
 from app_api.models import Tag
 from django.db.models import Q
 import datetime
+from django.core.files.base import ContentFile
 
 
 class PostView(ViewSet):
@@ -23,12 +25,7 @@ class PostView(ViewSet):
             Response -- JSON serialized game type"""
         try:
             post = Post.objects.get(pk=pk)
-            reactions = post.reactions.all()
-            for reaction in reactions:
-                reaction.reaction_count = post
-            reaction_serializer = ReactionSerializer(reactions, many=True)
             serializer = PostSerializer(post)
-            serializer.data['reactions'] = reaction_serializer.data
             return Response(serializer.data)
         except Post.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
@@ -39,9 +36,6 @@ class PostView(ViewSet):
             Response -- JSON serialized list of game types
         """
         posts = Post.objects.all()
-
-        # posts = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
-
         subscriptions = self.request.query_params.get('subscriptions', None)
         if subscriptions is not None:
             currentuser = RareUser.objects.get(user=request.auth.user)
@@ -76,23 +70,30 @@ class PostView(ViewSet):
         """Handle POST operations"""
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
+
+        format, imgstr = request.data["image_url"].split(';base64,')
+        ext = format.split('/')[-1]
+        data = ContentFile(base64.b64decode(
+            imgstr), name=f'{request.data["title"]}-{uuid.uuid4()}.{ext}')
+
         if user.user.is_staff == True:
             post = Post.objects.create(
                 title=request.data["title"],
                 user=user,
                 category=cat,
                 publication_date=datetime.date.today(),
-                image_url=request.data["image_url"],
+                image_url=data,
                 content=request.data["content"],
                 approved=True
             )
+
         else:
             post = Post.objects.create(
                 title=request.data["title"],
                 user=user,
                 category=cat,
                 publication_date=datetime.date.today(),
-                image_url=request.data["image_url"],
+                image_url=data,
                 content=request.data["content"],
                 approved=False
             )
@@ -129,27 +130,11 @@ class PostView(ViewSet):
         return Response({'message': 'Reaction Added'}, status=status.HTTP_201_CREATED)
 
 
-class ReactionSerializer(serializers.ModelSerializer):
-    """
-    JSON serializer for the tag data received
-    """
-    # reaction_count = serializers.IntegerField()
-
-    class Meta:
-        model = Reaction
-        fields = ('id', 'label', 'image_url',
-                  'reaction_count'
-                  )
-        depth = 1
-
-
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
     """
-    reactions = ReactionSerializer(many=True)
-
     class Meta:
         model = Post
-        fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',
-                  'content', 'tags', 'reactions', 'approved')
+        fields = ('id', 'user', 'category', 'title', 'publication_date',
+                  'image_url',  'content', 'tags', 'reactions', 'approved')
         depth = 2
