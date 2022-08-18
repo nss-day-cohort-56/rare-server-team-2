@@ -22,7 +22,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from app_api.views.category import CategoryView
 from app_api.views.comment import CommentView
-from app_api.views import TagView, ReactionView, RareUserView, PostView, register_user, login_user, SubscriptionView
+from app_api.views import TagView, ReactionView, RareUserView, PostView, register_user, login_user, SubscriptionView, DemotionView
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'comments', CommentView, 'comment')
@@ -32,6 +32,7 @@ router.register(r'tags', TagView, 'tag')
 router.register(r'reactions', ReactionView, 'reaction')
 router.register(r'users', RareUserView, 'rareuser')
 router.register(r'subscribe', SubscriptionView, 'subscribe')
+router.register(r'demote', DemotionView, 'demote' )
 
 
 urlpatterns = [

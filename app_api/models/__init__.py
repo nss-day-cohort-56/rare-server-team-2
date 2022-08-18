@@ -7,4 +7,5 @@ from .rare_user import RareUser
 from .reaction import Reaction
 from .subscription import Subscription
 from .tag import Tag
+from .demotion_queue import DemotionQueue
 
