@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import serializers, status
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
+import uuid
 
 
 from django.core.files.base import ContentFile
@@ -35,9 +36,6 @@ class RareUserView(ViewSet):
         """
         rare_users = RareUser.objects.all().order_by("user__username")
         
-
-
-
         serializer = RareUserSerializer(rare_users, many=True)
         return Response(serializer.data)
 
@@ -101,6 +99,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RareUserSerializer(serializers.ModelSerializer):
     """JSON serializer for RareUsers"""
+    user = UserSerializer()
     class Meta:
         model = RareUser
         fields = ('id', 'user', 'bio', 'profile_image_url', 'created_on')
