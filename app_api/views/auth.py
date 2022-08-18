@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -53,9 +54,6 @@ def register_user(request):
     # TODO: If you're using a model with a 1 to 1 relationship to the django user, create that object here
     rare_user = RareUser.objects.create(
         bio=request.data['bio'],
-        profile_image_url=request.data['profile_image_url'],
-        created_on=request.data['created_on'],
-        active=request.data['active'],
         user=new_user
     )
 
