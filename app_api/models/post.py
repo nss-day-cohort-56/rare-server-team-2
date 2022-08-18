@@ -11,3 +11,11 @@ class Post(models.Model):
     approved = models.BooleanField()
     tags = models.ManyToManyField("Tag", through="PostTag", related_name="post_tags")
     reactions = models.ManyToManyField("Reaction", through="PostReaction", related_name="post_reaction")
+
+    @property
+    def reaction_added(self):
+        return self.__reaction_added
+    
+    @reaction_added.setter
+    def reaction_added(self, value):
+        self._reaction_added = value

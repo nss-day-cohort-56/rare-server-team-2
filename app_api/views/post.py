@@ -145,5 +145,5 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',
-                  'content', 'tags', 'reactions', 'approved')
+                  'content', 'tags', 'reactions', 'approved', 'reaction_added')
         depth = 2
