@@ -70,21 +70,20 @@ class RareUserView(ViewSet):
         """Handle PUT requests for a user
         
         Response --  200 OK status code"""
-        user = User.objects.get(pk=pk)
-        if user.admin_pending is True:   
-            user.is_active = not user.is_active
-            user.save()
-            serializer = UserSerializer(user)
+        rare_user = RareUser.objects.get(pk=pk)
+        rare_user.user.is_active = not rare_user.user.is_active
+        rare_user.user.save()
+        serializer = UserSerializer(rare_user.user)
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
 
     @action(methods=["put"], detail=True)
     def change_staff_status(self, request, pk):
-        user = User.objects.get(pk=pk)
-        if user.admin_pending is True:
-            user.is_staff = not user.is_staff
-            user.save()
-            serializer = UserSerializer(user)
+        rare_user = RareUser.objects.get(pk=pk)
+        
+        rare_user.user.is_staff = not rare_user.user.is_staff
+        rare_user.user.save()
+        serializer = UserSerializer(rare_user.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
