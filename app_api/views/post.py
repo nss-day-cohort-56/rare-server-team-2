@@ -1,11 +1,9 @@
-import base64
 from datetime import datetime
-from email.policy import default
-import uuid
 from django.http import HttpResponseServerError
 from django.db.models import Count
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import serializers, status
 from app_api.models import Post
 from app_api.models import RareUser
@@ -14,7 +12,6 @@ from app_api.models import PostTag
 from app_api.models import Tag
 from django.db.models import Q
 import datetime
-from django.core.files.base import ContentFile
 
 
 class PostView(ViewSet):
@@ -26,9 +23,9 @@ class PostView(ViewSet):
             Response -- JSON serialized game type"""
         try:
             post = Post.objects.get(pk=pk)
-            reactions= post.reactions.all()
+            reactions = post.reactions.all()
             for reaction in reactions:
-                reaction.reaction_count=post
+                reaction.reaction_count = post
             reaction_serializer = ReactionSerializer(reactions, many=True)
             serializer = PostSerializer(post)
             serializer.data['reactions'] = reaction_serializer.data
@@ -43,7 +40,6 @@ class PostView(ViewSet):
         """
         posts = Post.objects.all()
 
-
         # posts = Post.objects.annotate(reaction_count=Count('post_id_reaction'))
 
         subscriptions = self.request.query_params.get('subscriptions', None)
@@ -55,10 +51,9 @@ class PostView(ViewSet):
                 for post in posts:
                     if post.user == sub.author:
                         subbed_posts.append(post)
-            
+
             posts = set(subbed_posts)
-                #only posts whose authorId matches the authors subscribed to
-            
+            # only posts whose authorId matches the authors subscribed to
 
         search_text = self.request.query_params.get('title', None)
         if search_text is not None:
@@ -81,32 +76,23 @@ class PostView(ViewSet):
         """Handle POST operations"""
         user = RareUser.objects.get(user=request.auth.user)
         cat = Category.objects.get(pk=request.data["category_id"])
-        
-        format, imgstr = request.data["image_url"].split(';base64,')
-        ext = format.split('/')[-1]
-        data = ContentFile(base64.b64decode(imgstr), name=f'{request.data["title"]}-{uuid.uuid4()}.{ext}')
-        
-        
         if user.user.is_staff == True:
             post = Post.objects.create(
-            title=request.data["title"],
-            user=user,
-            category=cat,
-            publication_date=datetime.date.today(),
-            image_url=request.data["image_url"],
-            publication_date= datetime.date.today(),
-            image_url=data,
-            content=request.data["content"],
-            approved=True
+                title=request.data["title"],
+                user=user,
+                category=cat,
+                publication_date=datetime.date.today(),
+                image_url=request.data["image_url"],
+                content=request.data["content"],
+                approved=True
             )
-            
         else:
             post = Post.objects.create(
                 title=request.data["title"],
                 user=user,
                 category=cat,
-                publication_date= datetime.date.today(),
-                image_url=data,
+                publication_date=datetime.date.today(),
+                image_url=request.data["image_url"],
                 content=request.data["content"],
                 approved=False
             )
@@ -134,6 +120,13 @@ class PostView(ViewSet):
         post.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['post'], detail=True)
+    def add(self, request, pk):
+
+        post = Post.objects.get(pk=pk)
+        post.reactions.add(request.data['reaction_id'])
+
+        return Response({'message': 'Reaction Added'}, status=status.HTTP_201_CREATED)
 
 
 class ReactionSerializer(serializers.ModelSerializer):
@@ -145,9 +138,10 @@ class ReactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reaction
         fields = ('id', 'label', 'image_url',
-        'reaction_count'
-        )
+                  'reaction_count'
+                  )
         depth = 1
+
 
 class PostSerializer(serializers.ModelSerializer):
     """JSON serializer for game types
@@ -157,5 +151,5 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'user', 'category', 'title', 'publication_date', 'image_url',
-                  'content', 'tags', 'reactions', 'approved', 'reaction_added')
+                  'content', 'tags', 'reactions', 'approved')
         depth = 2

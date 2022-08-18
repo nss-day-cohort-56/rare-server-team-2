@@ -6,18 +6,9 @@ class Post(models.Model):
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     publication_date = models.DateField()
-    image_url = models.ImageField(
-        upload_to='actionimages', height_field=None,
-        width_field=None, max_length=None, null=True)
+    image_url = models.CharField(max_length=1000)
     content = models.CharField(max_length=2000)
     approved = models.BooleanField()
     tags = models.ManyToManyField("Tag", through="PostTag", related_name="post_tags")
     reactions = models.ManyToManyField("Reaction", through="PostReaction", related_name="post_reaction")
 
-    @property
-    def reaction_added(self):
-        return self.__reaction_added
-    
-    @reaction_added.setter
-    def reaction_added(self, value):
-        self._reaction_added = value
