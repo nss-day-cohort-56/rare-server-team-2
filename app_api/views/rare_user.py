@@ -81,7 +81,7 @@ class RareUserView(ViewSet):
     @action(methods=["put"], detail=True)
     def change_staff_status(self, request, pk):
         user = User.objects.get(pk=pk)
-        user.is_active = not user.is_active
+        user.is_staff = not user.is_staff
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
