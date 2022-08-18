@@ -1,3 +1,4 @@
+from urllib import response
 from django.http import HttpResponseServerError
 from django.contrib.auth.models import User
 from rest_framework.viewsets import ViewSet
@@ -19,7 +20,22 @@ class ReactionView(ViewSet):
 
         serializer = ReactionSerializer(reactions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+    
+    def create(self, request):
+        """Handle POST operations
 
+        Returns
+            Response -- JSON serialized category instance
+        """
+        reaction = Reaction.objects.create(
+        label = request.data['label'],
+        image_url = request.data['image_url']
+            )
+
+        serializer = ReactionSerializer(reaction)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ReactionSerializer(serializers.ModelSerializer):
     """
