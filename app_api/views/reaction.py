@@ -44,4 +44,4 @@ class ReactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reaction
-        fields = ('id', 'label')
+        fields = ('id', 'label', 'image_url')
