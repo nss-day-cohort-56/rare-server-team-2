@@ -14,7 +14,7 @@ def login_user(request):
     '''Handles the authentication of a user
 
     Method arguments:
-      request -- The full HTTP request object
+        request -- The full HTTP request object
     '''
     username = request.data['username']
     password = request.data['password']
@@ -48,14 +48,15 @@ def register_user(request):
     new_user = User.objects.create_user(
         username=request.data['username'],
         password=request.data['password'],
+        first_name=request.data['first_name'],
+        last_name=request.data['last_name'],
+        email=request.data['email']
+
     )
 
     # TODO: If you're using a model with a 1 to 1 relationship to the django user, create that object here
     rare_user = RareUser.objects.create(
         bio=request.data['bio'],
-        profile_image_url=request.data['profile_image_url'],
-        created_on=request.data['created_on'],
-        active=request.data['active'],
         user=new_user
     )
 
