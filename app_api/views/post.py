@@ -15,6 +15,8 @@ from django.db.models import Q
 import datetime
 from django.core.files.base import ContentFile
 
+from app_api.models.post_reaction import PostReaction
+
 
 class PostView(ViewSet):
     """Level up game types view"""
@@ -25,8 +27,16 @@ class PostView(ViewSet):
             Response -- JSON serialized game type"""
         try:
             post = Post.objects.get(pk=pk)
+            reactions = post.reactions.all()
+            for reaction in reactions:
+                reaction.reaction_count = post
+            reaction_serializer = ReactionSerializer(reactions, many=True)
             serializer = PostSerializer(post)
-            return Response(serializer.data)
+            post_data = {
+                "post": serializer.data, 
+                "reactions": reaction_serializer.data
+            }
+            return Response(post_data)
         except Post.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
@@ -125,9 +135,19 @@ class PostView(ViewSet):
     def add(self, request, pk):
 
         post = Post.objects.get(pk=pk)
-        post.reactions.add(request.data['reaction_id'])
+        PostReaction.objects.create(post=post, reaction_id=request.data['reaction_id'])
 
         return Response({'message': 'Reaction Added'}, status=status.HTTP_201_CREATED)
+
+
+class ReactionSerializer(serializers.ModelSerializer):
+    """
+    JSON serializer for the tag data received
+    """
+
+    class Meta:
+        model = Reaction
+        fields = ('id', 'label', 'image_url', 'reaction_count')
 
 
 class PostSerializer(serializers.ModelSerializer):
