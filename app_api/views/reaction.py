@@ -36,6 +36,28 @@ class ReactionView(ViewSet):
 
         serializer = ReactionSerializer(reaction)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, pk):
+        """ PUT request for the selected reaction
+
+        Returns:
+            Response: Empty body with a 204 status code.
+        """
+
+        reaction=Reaction.objects.get(pk=pk)
+        reaction.label=request.data["label"]
+        reaction.save()
+        
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    
+    def destroy(self, request, pk):
+        reaction = Reaction.objects.get(pk=pk)
+        reaction.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    
+    
 
 class ReactionSerializer(serializers.ModelSerializer):
     """
